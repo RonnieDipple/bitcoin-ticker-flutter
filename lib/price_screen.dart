@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io' show Platform;
-
+import 'apiKey.dart';
 import 'coin_data.dart';
+import 'package:http/http.dart' as http;
+// allows jason decoding
+import 'dart:convert';
+
+const url = 'https://rest.coinapi.io/v1/exchangerate/BTC/USD?apikey=$apiKey';
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -11,6 +16,18 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
+
+  void getData() async {
+    http.Response response = await http.get(url);
+    if (response.statusCode == 200) {
+      String data = response.body;
+      print(data);
+      var rate = jsonDecode(data)['rate'];
+      print(rate);
+    } else {
+      print(response.statusCode);
+    }
+  }
 
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> dropDownItems = [];
@@ -56,6 +73,7 @@ class _PriceScreenState extends State<PriceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    getData();
     return Scaffold(
       appBar: AppBar(
         title: Text('🤑 Coin Ticker'),
