@@ -1,34 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io' show Platform;
+import 'package:bitcoin_ticker/services/networking.dart';
 import 'apiKey.dart';
 import 'coin_data.dart';
-import 'package:http/http.dart' as http;
-// allows jason decoding
-import 'dart:convert';
 
-const url = 'https://rest.coinapi.io/v1/exchangerate/BTC/USD?apikey=$apiKey';
+const url = 'https://rest.coinapi.io/v1/exchangerate';
+String selectedCurrency = 'USD';
+String crypto = 'BTC';
+int rate;
 
 class PriceScreen extends StatefulWidget {
   @override
   _PriceScreenState createState() => _PriceScreenState();
 }
 
+void getData() async {
+  NetworkHelper networkHelper =
+      NetworkHelper('$url/$crypto/$selectedCurrency?apikey=$apiKey');
+  rate = await networkHelper.getData();
+}
+
 class _PriceScreenState extends State<PriceScreen> {
-  String selectedCurrency = 'USD';
-
-  void getData() async {
-    http.Response response = await http.get(url);
-    if (response.statusCode == 200) {
-      String data = response.body;
-      print(data);
-      var rate = jsonDecode(data)['rate'];
-      print(rate);
-    } else {
-      print(response.statusCode);
-    }
-  }
-
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> dropDownItems = [];
     for (String currency in currenciesList) {
@@ -93,7 +86,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = ? USD',
+                  '1 $crypto = $rate $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
