@@ -8,7 +8,7 @@ import 'coin_data.dart';
 const url = 'https://rest.coinapi.io/v1/exchangerate';
 String selectedCurrency = 'USD';
 String crypto = 'BTC';
-int rate;
+String rate = '?';
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -18,7 +18,7 @@ class PriceScreen extends StatefulWidget {
 void getData() async {
   NetworkHelper networkHelper =
       NetworkHelper('$url/$crypto/$selectedCurrency?apikey=$apiKey');
-  rate = await networkHelper.getData();
+  rate = '${await networkHelper.getData()}';
 }
 
 class _PriceScreenState extends State<PriceScreen> {
@@ -65,8 +65,13 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     getData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('🤑 Coin Ticker'),
